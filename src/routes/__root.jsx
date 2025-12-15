@@ -1,13 +1,25 @@
 import { Outlet, createRootRoute, Link } from '@tanstack/react-router'
-import { AppShell, Burger, Group, NavLink, Title } from '@mantine/core'
+import { AppShell, Burger, Group, NavLink, Title, ActionIcon, useMantineColorScheme, useComputedColorScheme, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconUser, IconUserCircle, IconNews } from '@tabler/icons-react'
+import { IconUser, IconUserCircle, IconNews, IconSun, IconMoon } from '@tabler/icons-react'
 
 // Componente raíz que envuelve todas las rutas
 // Aquí definimos el layout principal de la aplicación
 function RootComponent() {
     // Hook para manejar el estado de apertura/cierre del menú móvil
     const [opened, { toggle }] = useDisclosure()
+    
+    // Hook para cambiar el esquema de color (light/dark)
+    const { setColorScheme } = useMantineColorScheme()
+    
+    // Hook para obtener el esquema de color actual computado
+    // Esto resuelve 'auto' al valor real (light o dark)
+    const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true })
+
+    // Función para alternar entre modo claro y oscuro
+    const toggleColorScheme = () => {
+        setColorScheme(computedColorScheme === 'dark' ? 'light' : 'dark')
+    }
 
     return (
         // AppShell es el componente de layout principal de Mantine
@@ -23,10 +35,29 @@ function RootComponent() {
         >
         {/* Header - Barra superior de la aplicación */}
         <AppShell.Header>
-            <Group h="100%" px="md">
-            {/* Botón hamburguesa para móviles */}
-            <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-            <Title order={3}>TanStack Router + Mantine</Title>
+            <Group h="100%" px="md" justify="space-between">
+            <Group>
+                {/* Botón hamburguesa para móviles */}
+                <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+                <Title order={3}>TanStack Router + Mantine</Title>
+            </Group>
+            
+            {/* Botón para cambiar entre modo claro y oscuro */}
+            <Tooltip label={computedColorScheme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}>
+                <ActionIcon
+                onClick={toggleColorScheme}
+                variant="default"
+                size="lg"
+                aria-label="Cambiar tema"
+                >
+                {/* Mostramos el icono del sol en modo oscuro y la luna en modo claro */}
+                {computedColorScheme === 'dark' ? (
+                    <IconSun size={20} />
+                ) : (
+                    <IconMoon size={20} />
+                )}
+                </ActionIcon>
+            </Tooltip>
             </Group>
         </AppShell.Header>
 
