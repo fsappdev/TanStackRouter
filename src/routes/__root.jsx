@@ -1,7 +1,7 @@
 import { Outlet, createRootRoute, Link } from '@tanstack/react-router'
 import { AppShell, Burger, Group, NavLink, Title, ActionIcon, useMantineColorScheme, useComputedColorScheme, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconUser, IconUserCircle, IconNews, IconSun, IconMoon } from '@tabler/icons-react'
+import { IconUser, IconUserCircle, IconNews, IconSun, IconMoon, IconHome } from '@tabler/icons-react'
 
 // Componente raíz que envuelve todas las rutas
 // Aquí definimos el layout principal de la aplicación
@@ -39,6 +39,21 @@ function RootComponent() {
             <Group>
                 {/* Botón hamburguesa para móviles */}
                 <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+                
+                {/* Icono de inicio que redirige a la página principal */}
+                <Tooltip label="Ir al inicio">
+                <ActionIcon
+                    component={Link}
+                    to="/"
+                    variant="subtle"
+                    size="lg"
+                    aria-label="Ir al inicio"
+                >
+                    <IconHome size={24} />
+                </ActionIcon>
+                </Tooltip>
+                
+                {/* Título de la aplicación */}
                 <Title order={3}>TanStack Router + Mantine</Title>
             </Group>
             
@@ -64,6 +79,15 @@ function RootComponent() {
         {/* Navbar - Menú lateral de navegación */}
         <AppShell.Navbar p="md">
             <Title order={4} mb="md">Navegación</Title>
+            
+            {/* Link a la página de inicio */}
+            <NavLink
+            component={Link}
+            to="/"
+            label="Inicio"
+            leftSection={<IconHome size={20} />}
+            onClick={() => opened && toggle()}
+            />
             
             {/* Link a la página de usuarios */}
             <NavLink
