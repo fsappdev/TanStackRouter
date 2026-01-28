@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Outlet, createRootRoute, Link } from '@tanstack/react-router'
+import { Outlet, createRootRoute, Link, useMatchRoute } from '@tanstack/react-router'
 import {
   AppShell,
   Burger,
@@ -10,7 +10,7 @@ import {
   Tooltip,
   useMantineColorScheme,
   useComputedColorScheme,
-  Stack, Divider, MenuDivider
+  Stack,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
@@ -23,6 +23,10 @@ import {
   IconSteeringWheel,
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarRightExpand,
+  IconUserPlus,
+  IconUserEdit,
+  IconApps,
+  IconChevronRight,
 } from '@tabler/icons-react'
 
 // Componente raíz que envuelve todas las rutas
@@ -34,6 +38,9 @@ function RootComponent() {
   // Estado para manejar el "collapse" de la barra lateral (ancho completo vs sólo iconos)
   const [navbarCollapsed, setNavbarCollapsed] = useState(false)
 
+  // Estado para manejar si el menú de "Usuarios" está abierto o cerrado
+  const [usersMenuOpened, setUsersMenuOpened] = useState(false)
+
   // Hook para cambiar el esquema de color (light/dark)
   const { setColorScheme } = useMantineColorScheme()
 
@@ -42,6 +49,9 @@ function RootComponent() {
   const computedColorScheme = useComputedColorScheme('light', {
     getInitialValueInEffect: true,
   })
+
+  // Hook para detectar la ruta actual y marcar como activa
+  const matchRoute = useMatchRoute()
 
   // Función para alternar entre modo claro y oscuro
   const toggleColorScheme = () => {
@@ -52,6 +62,18 @@ function RootComponent() {
   const toggleNavbarCollapsed = () => {
     setNavbarCollapsed((prev) => !prev)
   }
+
+  // Función para verificar si una ruta está activa
+  const isActive = (path) => {
+    return matchRoute({ to: path }) !== false
+  }
+
+  // Verificar si alguna subruta de usuarios está activa
+  const isUsersRouteActive = 
+    isActive('/user') || 
+    isActive('/newuser') || 
+    isActive('/edituser') || 
+    isActive('/usersmodules')
 
   return (
     // AppShell es el componente de layout principal de Mantine
@@ -115,20 +137,18 @@ function RootComponent() {
       <AppShell.Navbar p={navbarCollapsed ? 'sm' : 'md'}>
         {/* Encabezado del navbar: título "Navegación" o icono según esté colapsado */}
         <Group
-            /* cambiar el background color del grupo a un color gris claro y el borde redondeado con un radio de 10px  y un padding de 10px y un margin bottom de 10px */        
-          style={{ backgroundColor: '#f0f0f0', borderRadius: '10px', padding: '10px', marginBottom: '10px' }}
           mb="md"
           justify={navbarCollapsed ? 'center' : 'space-between'}
           gap="xs"
         >
           {/* Si está colapsado, mostramos solo el icono del timón */}
-          {navbarCollapsed ? null /* (
+          {navbarCollapsed ? (
             <Tooltip label="Navegación">
               <ActionIcon variant="subtle" aria-label="Navegación">
                 <IconSteeringWheel size={22} />
               </ActionIcon>
             </Tooltip>
-          ) */ : (
+          ) : (
             <Group gap="xs">
               <IconSteeringWheel size={20} />
               <Title order={4}>Navegación</Title>
@@ -157,14 +177,12 @@ function RootComponent() {
             </ActionIcon>
           </Tooltip>
         </Group>
-        
-        <Divider />
+
         {/* Links de navegación */}
         {/* Usamos Stack para apilar los elementos verticalmente */}
         <Stack gap="xs">
           {/* Link a la página de inicio */}
           <Tooltip
-            // Tooltip visible sobre todo cuando la barra está colapsada
             label="Inicio"
             position="right"
             disabled={!navbarCollapsed}
@@ -175,23 +193,75 @@ function RootComponent() {
               label={navbarCollapsed ? null : 'Inicio'}
               leftSection={<IconHome size={20} />}
               onClick={() => opened && toggle()}
+              active={isActive('/')}
             />
           </Tooltip>
 
-          {/* Link a la página de usuarios */}
-          <Tooltip
-            label="Usuarios"
-            position="right"
-            disabled={!navbarCollapsed}
-          >
+          {/* Menú desplegable de Usuarios (Nested NavLink) */}
+          {navbarCollapsed ? (
+            // Cuando está colapsado, mostramos solo el icono con tooltip
+            <Tooltip label="Usuarios" position="right">
+              <NavLink
+                component={Link}
+                to="/user"
+                leftSection={<IconUser size={20} />}
+                onClick={() => opened && toggle()}
+                active={isUsersRouteActive}
+              />
+            </Tooltip>
+          ) : (
+            // Cuando está expandido, mostramos el menú desplegable completo
             <NavLink
-              component={Link}
-              to="/user"
-              label={navbarCollapsed ? null : 'Usuarios'}
+              label="Usuarios"
               leftSection={<IconUser size={20} />}
-              onClick={() => opened && toggle()}
-            />
-          </Tooltip>
+              rightSection={
+                <IconChevronRight
+                  size={16}
+                  style={{
+                    transform: usersMenuOpened ? 'rotate(90deg)' : 'none',
+                    transition: 'transform 200ms ease',
+                  }}
+                />
+              }
+              onClick={() => setUsersMenuOpened((prev) => !prev)}
+              opened={usersMenuOpened}
+              active={isUsersRouteActive}
+            >
+              {/* Submenú de Usuarios */}
+              <NavLink
+                component={Link}
+                to="/user"
+                label="Lista de Usuarios"
+                leftSection={<IconUser size={18} />}
+                onClick={() => opened && toggle()}
+                active={isActive('/user')}
+              />
+              <NavLink
+                component={Link}
+                to="/newuser"
+                label="Nuevo Usuario"
+                leftSection={<IconUserPlus size={18} />}
+                onClick={() => opened && toggle()}
+                active={isActive('/newuser')}
+              />
+              <NavLink
+                component={Link}
+                to="/edituser"
+                label="Editar Usuario"
+                leftSection={<IconUserEdit size={18} />}
+                onClick={() => opened && toggle()}
+                active={isActive('/edituser')}
+              />
+              <NavLink
+                component={Link}
+                to="/usersmodules"
+                label="Módulos Disp."
+                leftSection={<IconApps size={18} />}
+                onClick={() => opened && toggle()}
+                active={isActive('/usersmodules')}
+              />
+            </NavLink>
+          )}
 
           {/* Link a la página de perfil */}
           <Tooltip
@@ -205,6 +275,7 @@ function RootComponent() {
               label={navbarCollapsed ? null : 'Perfil'}
               leftSection={<IconUserCircle size={20} />}
               onClick={() => opened && toggle()}
+              active={isActive('/profile')}
             />
           </Tooltip>
 
@@ -220,6 +291,7 @@ function RootComponent() {
               label={navbarCollapsed ? null : 'Noticias'}
               leftSection={<IconNews size={20} />}
               onClick={() => opened && toggle()}
+              active={isActive('/news')}
             />
           </Tooltip>
         </Stack>
@@ -243,12 +315,18 @@ export const Route = createRootRoute({
 // TanStack Router usa este árbol para manejar la navegación
 import { Route as IndexRoute } from './index'
 import { Route as UserRoute } from './user'
+import { Route as NewUserRoute } from './newuser'
+import { Route as EditUserRoute } from './edituser'
+import { Route as UsersModulesRoute } from './usersmodules'
 import { Route as ProfileRoute } from './profile'
 import { Route as NewsRoute } from './news'
 
 export const routeTree = Route.addChildren([
   IndexRoute,
   UserRoute,
+  NewUserRoute,
+  EditUserRoute,
+  UsersModulesRoute,
   ProfileRoute,
   NewsRoute,
 ])
