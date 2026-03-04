@@ -25,103 +25,104 @@ function RootComponent() {
         // AppShell es el componente de layout principal de Mantine
         // Proporciona header, navbar, y área de contenido
         <AppShell
-        header={{ height: 60 }}
-        navbar={{
-            width: 250,
-            breakpoint: 'sm',
-            collapsed: { mobile: !opened }
-        }}
-        padding="md"
+            header={{ height: 60 }}
+            navbar={{
+                width: 250,
+                breakpoint: 'sm',
+                collapsed: { mobile: !opened }
+            }}
+            padding="md"
         >
-        {/* Header - Barra superior de la aplicación */}
-        <AppShell.Header>
-            <Group h="100%" px="md" justify="space-between">
-            <Group>
-                {/* Botón hamburguesa para móviles */}
-                <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+
+            {/* Header - Barra superior de la aplicación */}
+            <AppShell.Header>
+                <Group h="100%" px="md" justify="space-between">
+                <Group>
+                    {/* Botón hamburguesa para móviles */}
+                    <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+                    
+                    {/* Icono de inicio que redirige a la página principal */}
+                    <Tooltip label="Ir al inicio">
+                    <ActionIcon
+                        component={Link}
+                        to="/"
+                        variant="subtle"
+                        size="lg"
+                        aria-label="Ir al inicio"
+                    >
+                        <IconHome size={24} />
+                    </ActionIcon>
+                    </Tooltip>
+                    
+                    {/* Título de la aplicación */}
+                    <Title order={3}>TanStack Router + Mantine</Title>
+                </Group>
                 
-                {/* Icono de inicio que redirige a la página principal */}
-                <Tooltip label="Ir al inicio">
-                <ActionIcon
+                {/* Botón para cambiar entre modo claro y oscuro */}
+                <Tooltip label={computedColorScheme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}>
+                    <ActionIcon
+                    onClick={toggleColorScheme}
+                    variant="default"
+                    size="lg"
+                    aria-label="Cambiar tema"
+                    >
+                    {/* Mostramos el icono del sol en modo oscuro y la luna en modo claro */}
+                    {computedColorScheme === 'dark' ? (
+                        <IconSun size={20} />
+                    ) : (
+                        <IconMoon size={20} />
+                    )}
+                    </ActionIcon>
+                </Tooltip>
+                </Group>
+            </AppShell.Header>
+
+            {/* Navbar - Menú lateral de navegación */}
+            <AppShell.Navbar p="md">
+                <Title order={4} mb="md">Navegación</Title>
+                
+                {/* Link a la página de inicio */}
+                <NavLink
                     component={Link}
                     to="/"
-                    variant="subtle"
-                    size="lg"
-                    aria-label="Ir al inicio"
-                >
-                    <IconHome size={24} />
-                </ActionIcon>
-                </Tooltip>
+                    label="Inicio"
+                    leftSection={<IconHome size={20} />}
+                    onClick={() => opened && toggle()}
+                />
                 
-                {/* Título de la aplicación */}
-                <Title order={3}>TanStack Router + Mantine</Title>
-            </Group>
-            
-            {/* Botón para cambiar entre modo claro y oscuro */}
-            <Tooltip label={computedColorScheme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}>
-                <ActionIcon
-                onClick={toggleColorScheme}
-                variant="default"
-                size="lg"
-                aria-label="Cambiar tema"
-                >
-                {/* Mostramos el icono del sol en modo oscuro y la luna en modo claro */}
-                {computedColorScheme === 'dark' ? (
-                    <IconSun size={20} />
-                ) : (
-                    <IconMoon size={20} />
-                )}
-                </ActionIcon>
-            </Tooltip>
-            </Group>
-        </AppShell.Header>
+                {/* Link a la página de usuarios */}
+                <NavLink
+                    component={Link}
+                    to="/user"
+                    label="Usuarios"
+                    leftSection={<IconUser size={20} />}
+                    onClick={() => opened && toggle()}
+                />
+                
+                {/* Link a la página de perfil */}
+                <NavLink
+                    component={Link}
+                    to="/profile"
+                    label="Perfil"
+                    leftSection={<IconUserCircle size={20} />}
+                    onClick={() => opened && toggle()}
+                />
+                
+                {/* Link a la página de noticias */}
+                <NavLink
+                    component={Link}
+                    to="/news"
+                    label="Noticias"
+                    leftSection={<IconNews size={20} />}
+                    onClick={() => opened && toggle()}
+                />
+            </AppShell.Navbar>
 
-        {/* Navbar - Menú lateral de navegación */}
-        <AppShell.Navbar p="md">
-            <Title order={4} mb="md">Navegación</Title>
-            
-            {/* Link a la página de inicio */}
-            <NavLink
-            component={Link}
-            to="/"
-            label="Inicio"
-            leftSection={<IconHome size={20} />}
-            onClick={() => opened && toggle()}
-            />
-            
-            {/* Link a la página de usuarios */}
-            <NavLink
-            component={Link}
-            to="/user"
-            label="Usuarios"
-            leftSection={<IconUser size={20} />}
-            onClick={() => opened && toggle()}
-            />
-            
-            {/* Link a la página de perfil */}
-            <NavLink
-            component={Link}
-            to="/profile"
-            label="Perfil"
-            leftSection={<IconUserCircle size={20} />}
-            onClick={() => opened && toggle()}
-            />
-            
-            {/* Link a la página de noticias */}
-            <NavLink
-            component={Link}
-            to="/news"
-            label="Noticias"
-            leftSection={<IconNews size={20} />}
-            onClick={() => opened && toggle()}
-            />
-        </AppShell.Navbar>
-
-        {/* Main - Área principal donde se renderizan las rutas hijas */}
-        <AppShell.Main>
-            {/* Outlet renderiza el contenido de la ruta activa */}
-            <Outlet />
-        </AppShell.Main>
+            {/* Main - Área principal donde se renderizan las rutas hijas */}
+            <AppShell.Main>
+                {/* Outlet renderiza el contenido de la ruta activa */}
+                <Outlet />
+            </AppShell.Main>
         </AppShell>
     )
 }
